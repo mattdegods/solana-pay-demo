@@ -7,7 +7,7 @@ export default function ConfirmedPage() {
     <div className="flex flex-col items-center gap-8">
       <BackLink href="/">Home</BackLink>
 
-      <PageHeading>Thank you, enjoy your cookies!</PageHeading>
+      <PageHeading>Thank you, enjoy your coffee!</PageHeading>
 
       <div className="h-80 w-80">
         <Confirmed />

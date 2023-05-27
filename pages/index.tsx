@@ -8,7 +8,7 @@ export default function HomePage() {
 
   return (
     <div className="m-auto flex max-w-4xl flex-col items-stretch gap-8">
-      <SiteHeading>Cookies Inc</SiteHeading>
+      <SiteHeading>Upstate Coffee Collective</SiteHeading>
 
       {/* We add the Solana wallet connect button */}
       <div className="mx-auto w-fit">

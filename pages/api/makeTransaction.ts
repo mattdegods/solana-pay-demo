@@ -36,8 +36,8 @@ type ErrorOutput = {
 
 const get = async (res: NextApiResponse<MakeTransactionGetResponse>) => {
   res.status(200).json({
-    label: 'Cookies Inc',
-    icon: 'https://freesvg.org/img/1370962427.png',
+    label: 'Upstate Coffee Collective ☕️',
+    icon: 'https://yt3.googleusercontent.com/ytc/AGIKgqOYgxrSyKA7TNYvObLolQ0VcO6HQdiEQCtCaQNk=s900-c-k-c0x00ffffff-no-rj',
   })
 }
 

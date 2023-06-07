@@ -6,6 +6,7 @@ import calculatePrice from '../../lib/calculatePrice'
 import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
 import {
   FindReferenceError,
+  TransactionRequestURLFields,
   TransferRequestURLFields,
   ValidateTransferError,
   createQR,
@@ -24,27 +25,48 @@ export default function Checkout() {
 
   const amount = useMemo(() => calculatePrice(router.query), [router.query])
 
-  // Get a connection to Solana devnet
+  // unique address that we can listen for payments to
+  const reference = useMemo(() => Keypair.generate().publicKey, [])
+
+  // read the URL query (which includes our chosen products)
+  const searchParams = new URLSearchParams({ reference: reference.toString() })
+  for (const [key, value] of Object.entries(router.query)) {
+    if (value) {
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          searchParams.append(key, v)
+        }
+      } else {
+        searchParams.append(key, value)
+      }
+    }
+  }
+
+  // get a connection to Solana devnet
   const network = WalletAdapterNetwork.Devnet
   const endpoint = clusterApiUrl(network)
   const connection = new Connection(endpoint)
 
-  // Unique address that we can listen for payments to
-  const reference = useMemo(() => Keypair.generate().publicKey, [])
-
-  // Solana Pay transfer params
-  const urlParams: TransferRequestURLFields = {
-    recipient: shopAddress,
-    splToken: usdcAddress,
-    amount,
-    reference,
-    label: 'Upstate Coffee Collective LLC',
-    message: 'Thanks for your order! ☕️',
-  }
-
-  // Encode the params into the format shown
-  const url = encodeURL(urlParams)
-  console.log({ url })
+  // show the QR code
+  useEffect(() => {
+    const { location } = window
+    // this URL on localhost looks something like
+    // http://localhost:3000/api/makeTransaction?reference=abc&rossa-geshe=1
+    const apiUrl = `${location.protocol}//${
+      location.host
+    }/api/makeTransaction?${searchParams.toString()}`
+    const urlParams: TransactionRequestURLFields = {
+      link: new URL(apiUrl),
+      label: 'Upstate Coffee Collective',
+      message: 'Thanks for your order! ☕️',
+    }
+    const solanaUrl = encodeURL(urlParams)
+    const qr = createQR(solanaUrl, 512, 'transparent')
+    if (qrRef.current && amount.isGreaterThan(0)) {
+      qrRef.current.innerHTML = ''
+      qr.append(qrRef.current)
+    }
+  })
 
   // Check every 0.5s if the transaction is completed
   useEffect(() => {
@@ -84,15 +106,6 @@ export default function Checkout() {
       clearInterval(interval)
     }
   }, [amount])
-
-  // Show the QR code
-  useEffect(() => {
-    const qr = createQR(url, 512, 'transparent')
-    if (qrRef.current && amount.isGreaterThan(0)) {
-      qrRef.current.innerHTML = ''
-      qr.append(qrRef.current)
-    }
-  })
 
   return (
     <div className="flex flex-col items-center gap-8">

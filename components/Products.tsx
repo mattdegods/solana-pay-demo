@@ -17,7 +17,7 @@ export default function Products({ submitTarget, enabled }: Props) {
           {products.map((product) => {
             return (
               <div
-                className="rounded-md bg-white p-8 text-left"
+                className="rounded-xl bg-white p-8 text-left"
                 key={product.id}
               >
                 <h3 className="text-2xl font-bold">{product.name}</h3>
